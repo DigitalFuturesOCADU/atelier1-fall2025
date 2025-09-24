@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
+  
+  <title>Mobile p5.js Project</title>
+  
+  <style>
+    /* =========================================== */
+    /* GESTURE BLOCKING CSS - DO NOT MODIFY       */
+    /* =========================================== */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      
+      /* Prevent text selection */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      
+      /* Prevent tap highlighting */
+      -webkit-tap-highlight-color: transparent;
+      
+      /* Prevent callout on long-press */
+      -webkit-touch-callout: none;
+    }
+    
+    html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      
+      /* Prevent pull-to-refresh and overscroll */
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+      overscroll-behavior-x: none;
+    }
+    
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      
+      /* Disable all touch actions by default */
+      touch-action: none;
+      
+      /* Prevent overscroll bounce iOS */
+      -webkit-overflow-scrolling: none;
+      
+      /* Default background */
+      background: #000;
+      
+      /* Ensure no margins */
+      display: block;
+    }
+    
+    /* Canvas must fill screen */
+    main {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      position: fixed;
+    }
+    
+    canvas {
+      display: block;
+      touch-action: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+    
+    /* =========================================== */
+    /* START BUTTON STYLING                       */
+    /* =========================================== */
+    
+    #startButton {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000;
+      
+      /* Large, friendly button */
+      padding: 40px 60px;
+      font-size: 24px;
+      font-weight: bold;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      
+      /* Styling */
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      cursor: pointer;
+      
+      /* Animation */
+      transition: all 0.3s ease;
+    }
+    
+    #startButton:active {
+      transform: translate(-50%, -50%) scale(0.95);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    
+    #startButton.hidden {
+      display: none;
+    }
+    
+    /* Loading/status text */
+    #statusText {
+      position: fixed;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 9999;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      font-size: 14px;
+      text-align: center;
+      opacity: 0.7;
+    }
+    
+    #statusText.hidden {
+      display: none;
+    }
+  </style>
+  
+  <!-- p5.js libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/addons/p5.sound.min.js"></script>
+</head>
+<body>
+  <!-- Start Button (will be hidden after permissions granted) -->
+  <button id="startButton">START</button>
+  <div id="statusText" class="hidden">Requesting permissions...</div>
+  
+  <!-- ============================================= -->
+  <!-- PERMISSION AND GESTURE HANDLING SCRIPT       -->
+  <!-- Students don't need to modify this           -->
+  <!-- ============================================= -->
+  <script src="permissionsAll.js"></script>
+  
+  <!-- ============================================= -->
+  <!-- LOAD THE STUDENT'S SKETCH                    -->
+  <!-- ============================================= -->
+  <script src="sketch.js"></script>
+</body>
+</html>
