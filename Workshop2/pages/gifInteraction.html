@@ -1523,12 +1523,12 @@
         function updateGifInfo(gif, source) {
             console.log('Updating GIF info:', { gif, source });
             
-            if (gif) {
+            if (currentGif) {
                 document.getElementById('gifSource').textContent = source || 'Unknown';
-                document.getElementById('gifResolution').textContent = `${gif.width} × ${gif.height}`;
+                document.getElementById('gifResolution').textContent = `${currentGif.width} × ${currentGif.height}`;
                 
-                if (typeof gif.numFrames === 'function') {
-                    document.getElementById('gifFrameCount').textContent = gif.numFrames();
+                if (typeof currentGif.numFrames === 'function') {
+                    document.getElementById('gifFrameCount').textContent = currentGif.numFrames();
                 } else {
                     document.getElementById('gifFrameCount').textContent = '1 (static image)';
                 }
@@ -1599,6 +1599,15 @@
                     updateGifStatus(`Loaded: ${source}`);
                     updateGifInfo(currentGif, source);
                     createFrameStrip(currentGif);
+                    
+                    // Refresh interactive examples with new GIF
+                    const currentTab = document.querySelector('.tab-content.active');
+                    if (currentTab && currentTab.id === 'interaction-examples') {
+                        console.log('Refreshing interactive examples with new GIF');
+                        setTimeout(() => {
+                            initializeInteractiveExamples();
+                        }, 100);
+                    }
                 },
                 function(err) {
                     console.error('ERROR: Failed to load GIF:', err);
@@ -2211,7 +2220,7 @@
                 let speedIndex = 1; // Start with Normal speed
                 const speeds = [50, 100, 200, 500]; // Delay values in milliseconds
                 const speedNames = ['Fast', 'Normal', 'Slow', 'Very Slow'];
-                let gif; // Independent GIF instance
+                let localGifDelay = speeds[speedIndex]; // Track our local delay setting
                 
                 p.setup = () => {
                     const canvas = p.createCanvas(260, 180);
@@ -2226,35 +2235,22 @@
                     // Prevent default touch behaviors on the canvas
                     canvas.canvas.style.touchAction = 'none';
                     
-                    // Load our own independent GIF instance
-                    gif = p.loadImage('images/default.gif');
-                    
-                    // Wait for GIF to load and initialize
-                    const checkGifLoaded = () => {
-                        if (gif.width > 0) {
-                            gif.play();
-                            gif.delay(speeds[speedIndex]); // Set initial speed
-                            
-                            // Set initial speed display
-                            const speedDisplay = document.getElementById('speed3');
-                            if (speedDisplay) {
-                                speedDisplay.textContent = speedNames[speedIndex];
-                            }
-                        } else {
-                            setTimeout(checkGifLoaded, 100);
-                        }
-                    };
-                    checkGifLoaded();
+                    // Set initial speed display
+                    const speedDisplay = document.getElementById('speed3');
+                    if (speedDisplay) {
+                        speedDisplay.textContent = speedNames[speedIndex];
+                    }
                 };
                 
                 p.draw = () => {
                     p.background(240);
                     
-                    if (gif && gif.width > 0) {
-                        let scale = Math.min(p.width / gif.width, p.height / gif.height) * 0.8;
-                        let w = gif.width * scale;
-                        let h = gif.height * scale;
-                        p.image(gif, (p.width - w) / 2, (p.height - h) / 2, w, h);
+                    // Use currentGif directly (uploaded or default)
+                    if (currentGif && currentGif.width > 0) {
+                        let scale = Math.min(p.width / currentGif.width, p.height / currentGif.height) * 0.8;
+                        let w = currentGif.width * scale;
+                        let h = currentGif.height * scale;
+                        p.image(currentGif, (p.width - w) / 2, (p.height - h) / 2, w, h);
                     }
                     
                     // Instructions
@@ -2274,12 +2270,13 @@
                     lastInteractionTime = currentTime;
                     showInteractionFeedback('canvas3');
                     
-                    if (gif && typeof gif.delay === 'function') {
+                    if (currentGif && typeof currentGif.delay === 'function') {
                         // Cycle to next speed
                         speedIndex = (speedIndex + 1) % speeds.length;
+                        localGifDelay = speeds[speedIndex];
                         
-                        // Apply the new speed to our independent GIF
-                        gif.delay(speeds[speedIndex]);
+                        // Apply the new speed to currentGif temporarily for this example
+                        currentGif.delay(localGifDelay);
                         
                         // Update display (only Example 3 display, not global)
                         const speedDisplay = document.getElementById('speed3');
@@ -2323,7 +2320,6 @@
                 let interactionDelay = 50; // Faster response for scrubbing
                 let currentFrame = 0;
                 let totalFrames = 0;
-                let gif; // Independent GIF instance
                 let isPressed = false; // Track if mouse/touch is pressed
                 
                 p.setup = () => {
@@ -2345,11 +2341,7 @@
                     
                     console.log('Example 4 setup - Canvas created with dimensions:', canvas.width, 'x', canvas.height);
                     
-                    // Load our own independent GIF instance (same as Example 3)
-                    gif = p.loadImage('images/default.gif');
-                    console.log('Example 4 - Loading GIF from images/default.gif');
-                    
-                    // Get frame count from the shared currentGif (like Example 2)
+                    // Get frame count from the shared currentGif
                     if (currentGif && typeof currentGif.numFrames === 'function') {
                         totalFrames = currentGif.numFrames();
                         console.log('Example 4 - Got totalFrames from currentGif:', totalFrames);
@@ -2358,59 +2350,36 @@
                         totalFrames = 10; // Default fallback
                     }
                     
-                    // Wait for our own GIF to load
-                    const checkGifLoaded = () => {
-                        console.log('Example 4 - Checking if GIF loaded, width:', gif.width);
-                        
-                        if (gif.width > 0) {
-                            console.log('Example 4 - GIF loaded successfully');
-                            
-                            // Pause immediately and keep paused
-                            gif.pause();
-                            console.log('Example 4 - GIF paused');
-                            
-                            currentFrame = 0;
-                            
-                            // Set to first frame explicitly
-                            if (typeof gif.setFrame === 'function') {
-                                gif.setFrame(0);
-                                console.log('Example 4 - Set to frame 0');
-                            } else {
-                                console.log('Example 4 - setFrame function not available');
-                            }
-                            
-                            // Update display
-                            const frameDisplay = document.getElementById('frame4');
-                            const totalDisplay = document.getElementById('total4');
-                            if (frameDisplay) frameDisplay.textContent = (currentFrame + 1);
-                            if (totalDisplay) totalDisplay.textContent = totalFrames;
-                            
-                            console.log('Example 4 loaded:', totalFrames, 'frames, starting at frame 1');
-                        } else {
-                            console.log('Example 4 - GIF not loaded yet, retrying...');
-                            setTimeout(checkGifLoaded, 100);
-                        }
-                    };
-                    checkGifLoaded();
+                    // Initialize frame display
+                    const frameDisplay = document.getElementById('frame4');
+                    const totalDisplay = document.getElementById('total4');
+                    if (frameDisplay) frameDisplay.textContent = currentFrame + 1;
+                    if (totalDisplay) totalDisplay.textContent = totalFrames;
                 };
                 
                 p.draw = () => {
                     p.background(240);
                     
-                    // Ensure GIF stays paused for manual control
-                    if (gif && gif.width > 0) {
-                        // Always pause to prevent auto-play
-                        gif.pause();
+                    // Use currentGif directly and temporarily set frame for display
+                    if (currentGif && currentGif.width > 0) {
+                        // Store original frame and state
+                        let originalFrame = typeof currentGif.getCurrentFrame === 'function' ? currentGif.getCurrentFrame() : 0;
+                        let wasPlaying = isPlaying;
                         
-                        // Set to current frame for display
-                        if (typeof gif.setFrame === 'function' && totalFrames > 0) {
-                            gif.setFrame(currentFrame);
+                        // Temporarily set our desired frame
+                        if (typeof currentGif.setFrame === 'function' && totalFrames > 0) {
+                            currentGif.setFrame(currentFrame);
                         }
                         
-                        let scale = Math.min(p.width / gif.width, p.height / gif.height) * 0.8;
-                        let w = gif.width * scale;
-                        let h = gif.height * scale;
-                        p.image(gif, (p.width - w) / 2, (p.height - h) / 2, w, h);
+                        let scale = Math.min(p.width / currentGif.width, p.height / currentGif.height) * 0.8;
+                        let w = currentGif.width * scale;
+                        let h = currentGif.height * scale;
+                        p.image(currentGif, (p.width - w) / 2, (p.height - h) / 2, w, h);
+                        
+                        // Restore original frame if main GIF is playing
+                        if (wasPlaying && typeof currentGif.setFrame === 'function') {
+                            currentGif.setFrame(originalFrame);
+                        }
                     }
                     
                     // Draw scrub bar at bottom
@@ -2542,7 +2511,6 @@
                 let lastInteractionTime = 0;
                 let interactionDelay = 300;
                 let lastClickTime = 0;
-                let gif;
                 
                 p.setup = () => {
                     const canvas = p.createCanvas(260, 180);
@@ -2557,39 +2525,27 @@
                     // Prevent default touch behaviors on the canvas
                     canvas.canvas.style.touchAction = 'none';
                     
-                    // Load our own independent GIF instance
-                    gif = p.loadImage('images/default.gif');
-                    
-                    // Wait for GIF to load and initialize
-                    const checkGifLoaded = () => {
-                        if (gif.width > 0) {
-                            gif.play();
-                            
-                            // Update display
-                            const frameDisplay = document.getElementById('frame5');
-                            if (frameDisplay && typeof gif.getCurrentFrame === 'function') {
-                                frameDisplay.textContent = gif.getCurrentFrame() + 1;
-                            }
-                        } else {
-                            setTimeout(checkGifLoaded, 100);
-                        }
-                    };
-                    checkGifLoaded();
+                    // Initialize display with currentGif if available
+                    const frameDisplay = document.getElementById('frame5');
+                    if (frameDisplay && currentGif && typeof currentGif.getCurrentFrame === 'function') {
+                        frameDisplay.textContent = currentGif.getCurrentFrame() + 1;
+                    }
                 };
                 
                 p.draw = () => {
                     p.background(240);
                     
-                    if (gif && gif.width > 0) {
-                        let scale = Math.min(p.width / gif.width, p.height / gif.height) * 0.8;
-                        let w = gif.width * scale;
-                        let h = gif.height * scale;
-                        p.image(gif, (p.width - w) / 2, (p.height - h) / 2, w, h);
+                    // Use currentGif directly
+                    if (currentGif && currentGif.width > 0) {
+                        let scale = Math.min(p.width / currentGif.width, p.height / currentGif.height) * 0.8;
+                        let w = currentGif.width * scale;
+                        let h = currentGif.height * scale;
+                        p.image(currentGif, (p.width - w) / 2, (p.height - h) / 2, w, h);
                         
                         // Update frame display
                         const frameDisplay = document.getElementById('frame5');
-                        if (frameDisplay && typeof gif.getCurrentFrame === 'function') {
-                            frameDisplay.textContent = gif.getCurrentFrame() + 1;
+                        if (frameDisplay && typeof currentGif.getCurrentFrame === 'function') {
+                            frameDisplay.textContent = currentGif.getCurrentFrame() + 1;
                         }
                     }
                     
@@ -2610,9 +2566,9 @@
                     lastInteractionTime = currentTime;
                     showInteractionFeedback('canvas5');
                     
-                    if (gif && typeof gif.reset === 'function') {
-                        gif.reset();
-                        gif.play();
+                    if (currentGif && typeof currentGif.reset === 'function') {
+                        currentGif.reset();
+                        currentGif.play();
                         
                         // Update display
                         const frameDisplay = document.getElementById('frame5');
@@ -2671,7 +2627,9 @@
             const sketch6 = (p) => {
                 let lastInteractionTime = 0;
                 let interactionDelay = 300;
-                let gif;
+                let localSpeed = currentSpeed;
+                let localIsPlaying = true;
+                let localSpeedIndex = 0;
                 
                 p.setup = () => {
                     const canvas = p.createCanvas(260, 180);
@@ -2686,35 +2644,21 @@
                     // Prevent default touch behaviors on the canvas
                     canvas.canvas.style.touchAction = 'none';
                     
-                    // Load our own independent GIF instance
-                    gif = p.loadImage('images/default.gif');
-                    
-                    // Wait for GIF to load and initialize
-                    const checkGifLoaded = () => {
-                        if (gif.width > 0) {
-                            gif.play();
-                            gif.delay(currentSpeed); // Set initial speed
-                            
-                            // Update initial display
-                            const actionDisplay = document.getElementById('action6');
-                            if (actionDisplay) {
-                                actionDisplay.textContent = 'Playing - Normal Speed';
-                            }
-                        } else {
-                            setTimeout(checkGifLoaded, 100);
-                        }
-                    };
-                    checkGifLoaded();
+                    // Update initial display
+                    const actionDisplay = document.getElementById('action6');
+                    if (actionDisplay) {
+                        actionDisplay.textContent = 'Playing - Normal Speed';
+                    }
                 };
                 
                 p.draw = () => {
                     p.background(240);
                     
-                    if (gif && gif.width > 0) {
-                        let scale = Math.min(p.width / gif.width, p.height / gif.height) * 0.6;
-                        let w = gif.width * scale;
-                        let h = gif.height * scale;
-                        p.image(gif, (p.width - w) / 2, (p.height - h) / 2 + 10, w, h);
+                    if (currentGif && currentGif.width > 0) {
+                        let scale = Math.min(p.width / currentGif.width, p.height / currentGif.height) * 0.6;
+                        let w = currentGif.width * scale;
+                        let h = currentGif.height * scale;
+                        p.image(currentGif, (p.width - w) / 2, (p.height - h) / 2 + 10, w, h);
                     }
                     
                     // Draw zone lines
@@ -2742,38 +2686,38 @@
                     lastInteractionTime = currentTime;
                     showInteractionFeedback('canvas6');
                     
-                    if (!gif) return;
+                    if (!currentGif) return;
                     
                     const actionDisplay = document.getElementById('action6');
                     
                     if (zone === 0) {
                         // Top zone - play/pause
-                        if (isPlaying) {
-                            gif.pause();
+                        if (localIsPlaying) {
+                            currentGif.pause();
                             if (actionDisplay) actionDisplay.textContent = 'Paused';
                         } else {
-                            gif.play();
-                            if (actionDisplay) actionDisplay.textContent = 'Playing - ' + speedNames[speedIndex] + ' Speed';
+                            currentGif.play();
+                            if (actionDisplay) actionDisplay.textContent = 'Playing - ' + speedNames[localSpeedIndex] + ' Speed';
                         }
-                        isPlaying = !isPlaying;
-                        console.log('Zone 1: Play/Pause -', isPlaying ? 'Playing' : 'Paused');
+                        localIsPlaying = !localIsPlaying;
+                        console.log('Zone 1: Play/Pause -', localIsPlaying ? 'Playing' : 'Paused');
                     } else if (zone === 1) {
                         // Middle zone - speed cycling
-                        speedIndex = (speedIndex + 1) % speeds.length;
-                        currentSpeed = speeds[speedIndex];
-                        if (typeof gif.delay === 'function') {
-                            gif.delay(currentSpeed);
+                        localSpeedIndex = (localSpeedIndex + 1) % speeds.length;
+                        localSpeed = speeds[localSpeedIndex];
+                        if (typeof currentGif.delay === 'function') {
+                            currentGif.delay(localSpeed);
                         }
                         if (actionDisplay) {
-                            actionDisplay.textContent = (isPlaying ? 'Playing - ' : 'Paused - ') + speedNames[speedIndex] + ' Speed';
+                            actionDisplay.textContent = (localIsPlaying ? 'Playing - ' : 'Paused - ') + speedNames[localSpeedIndex] + ' Speed';
                         }
-                        console.log('Zone 2: Speed changed to', speedNames[speedIndex], '(' + currentSpeed + 'ms)');
+                        console.log('Zone 2: Speed changed to', speedNames[localSpeedIndex], '(' + localSpeed + 'ms)');
                     } else {
                         // Bottom zone - reset
-                        if (typeof gif.reset === 'function') {
-                            gif.reset();
-                            gif.play();
-                            isPlaying = true;
+                        if (typeof currentGif.reset === 'function') {
+                            currentGif.reset();
+                            currentGif.play();
+                            localIsPlaying = true;
                             if (actionDisplay) actionDisplay.textContent = 'Reset - Playing';
                         }
                         console.log('Zone 3: Reset animation');
