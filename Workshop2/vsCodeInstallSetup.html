@@ -66,6 +66,15 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
+        .extension-image {
+            width: 400px;
+            height: 200px;
+            object-fit: contain;
+            object-position: left;
+            display: block;
+            margin: 1em 0;
+        }
+        
         code {
             background-color: #f5f5f5;
             padding: 0.2em 0.4em;
@@ -256,7 +265,7 @@
 
     <h4>Step 2 – Install GitLens extension</h4>
 
-    <img src="setupImages/GitLens.png" alt="GitLens Extension">
+    <img src="setupImages/GitLens.png" alt="GitLens Extension" class="extension-image">
 
     <p>GitLens allows you to very simply version your project. It allows you to track files by snapshots in time rather than by filename. It also handles syncing the changes with Github.</p>
 
@@ -272,7 +281,7 @@
 
     <ol>
         <li><strong>p5js Snippets:</strong>
-            <img src="setupImages/P5CodeSnippets.png" alt="P5 Code Snippets Extension">
+            <img src="setupImages/P5CodeSnippets.png" alt="P5 Code Snippets Extension" class="extension-image">
             <ul>
                 <li>In the Extensions panel, search: <code>p5js Snippets</code></li>
                 <li>Select it and press the Install button</li>
@@ -280,7 +289,7 @@
         </li>
         
         <li><strong>P5 Project Creator:</strong>
-            <img src="setupImages/P5ProjectCreator.png" alt="P5 Project Creator Extension">
+            <img src="setupImages/P5ProjectCreator.png" alt="P5 Project Creator Extension" class="extension-image">
             <ul>
                 <li>In the Extensions panel, search: <code>P5 Project Creator</code></li>
                 <li>Select it and press the Install button</li>
@@ -290,12 +299,23 @@
 
     <h4>Step 4 – Install Live Server</h4>
 
-    <img src="setupImages/LiveServer.png" alt="Live Server Extension">
+    <img src="setupImages/LiveServer.png" alt="Live Server Extension" class="extension-image">
 
     <p>Live Server runs a local webserver to allow you to develop the HTML page locally on your machine and also access it from other devices.</p>
 
     <ol>
         <li>In the Extensions panel, search: <code>Live Server</code></li>
+        <li>Select it and press the Install button</li>
+    </ol>
+
+    <h4>Step 5 – Install Github Actions</h4>
+
+    <img src="setupImages/githubActions.png" alt="Github Actions Extension" class="extension-image">
+
+    <p>We will be using Github Actions to automatically build a new version of our html page each time the code is synced with the repo</p>
+
+    <ol>
+        <li>In the Extensions panel, search: <code>Github Actions</code></li>
         <li>Select it and press the Install button</li>
     </ol>
 

@@ -24,9 +24,7 @@
 - p5js Snippets
 - P5 Project Creator
 - Live Server
-
-### Other Tasks
-- Sign in to VS Code with your Github account
+- Github Actions
 
 ---
 
@@ -123,6 +121,15 @@ These extensions assist with code completion that is specific to P5 and also wit
 Live Server runs a local webserver to allow you to develop the HTML page locally on your machine and also access it from other devices.
 
 1. In the Extensions panel, search: `Live Server`
+2. Select it and press the Install button
+
+#### Step 5 – Install Github Actions
+
+![Live Server Extension](setupImages/githubActions.png)
+
+We will be using Github Actions to automatically build a new version of our html page each time the code is synced with the repo
+
+1. In the Extensions panel, search: `Github Actions`
 2. Select it and press the Install button
 
 #### If Completed Correctly this is how your extensions should look
