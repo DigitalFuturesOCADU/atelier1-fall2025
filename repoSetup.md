@@ -101,15 +101,3 @@ Now that the folder is created, you need to open it in VS Code to start coding.
 ![Open Folder](Workshop2/RepoSetup/05b_OpenFolder.png)
 
 1. To open it in VS Code either navigate **File → Open Folder** or use the **Open Folder** Button
-
-### Step 4 – Activate Github Actions
-
-Because we are using Github Actions to deploy our pages, VS Code will want to enable the extension.
-
-![Sign In GitHub](Workshop2/RepoSetup/11_SignInGithub.png)
-
-1. In the bottom right click **sign in**
-
-![Allow GitHub](Workshop2/RepoSetup/12_AllowGithub.png)
-
-2. Click **Allow**
